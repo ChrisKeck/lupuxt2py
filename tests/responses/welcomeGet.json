@@ -1,0 +1,14 @@
+{
+  "updates": {
+    "version": "HPGW 0.0.3.5L HPGW-L2-XA35E 2.1.2.5.3",
+    "em_ver": "0.0.3.5L",
+    "rf_ver": "HPGW-L2-XA35E",
+    "zb_ver": "2.1.2.5.3",
+    "zbs_ver": "3.1.2.6.1",
+    "zw_ver": "",
+    "gsm_ver": "Cinterion BGS2-W REVISION 01.301",
+    "publicip": "111.228.184.122",
+    "ip": "192.168.0.10",
+    "mac": "00:1D:94:03:87:65"
+  }
+}

@@ -14,3 +14,5 @@ __pycache__/
 /data
 /.idea
 /sampleproject.iml
+/.env
+/*.iml

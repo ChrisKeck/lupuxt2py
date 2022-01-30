@@ -1,39 +1,9 @@
 import argparse
 import logging
-from typing import List
 
-from lupuxt2py.conversion_service import ConversationService
-from lupuxt2py.domain.device import Device
-from lupuxt2py.domain.switchs import Switch
-from lupuxt2py.lupusec.lupusec_service import LupusecSevice
+from lupuxt2py import LupusecStateMachine
 
-_LOGGER = logging.getLogger(__name__)
-
-
-class Lupusec:
-    """Interface to Lupusec Webservices."""
-
-    def __init__(self, username, password, ip_address):
-        self.service = LupusecSevice(username, password, ip_address)
-        self.__conversationService = ConversationService(60, self.service)
-
-    def get_sensors(self) -> List[Device]:
-        sensors: List[Device] = list()
-        lst = self.service.get_record_list()
-        for sensor in self.service.get_sensor_list():
-            devices: List[Device] = self.__conversationService.get_devices_from_sensor(sensor, lst)
-            for device in devices:
-                if device is not None:
-                    sensors.append(device)
-        return sensors
-
-    def get_switches(self) -> List[Switch]:
-        switches: List[Switch] = list()
-        for sensor in self.service.get_switch_list():
-            device = self.__conversationService.get_device_from_switch(sensor)
-            if device is not None:
-                switches.append(device)
-        return switches
+_LOGGER = logging.getLogger("Test")
 
 
 def setup_logging(log_level=logging.INFO):
@@ -142,52 +112,19 @@ def call():
         log_level = logging.INFO
 
     setup_logging(log_level)
-
-    lupusec = None
-
     if not args.username or not args.password or not args.ip_address:
         raise Exception("Please supply a username, password and ip.")
-
-    def _devicePrint(dev, append=''):
-        _LOGGER.info("%s%s", repr(dev), append)
-
     try:
-        if args.username and args.password and args.ip_address:
-            lupusec = Lupusec(ip_address=args.ip_address,
-                              username=args.username,
-                              password=args.password)
-
-        # if args.arm:
-        #     if lupusec.get_alarm().set_away():
-        #         _LOGGER.info('Alarm mode changed to armed')
-        #     else:
-        #         _LOGGER.warning('Failed to change alarm mode to armed')
-
-        # if args.disarm:
-        #     if lupusec.get_alarm().set_standby():
-        #         _LOGGER.info('Alarm mode changed to disarmed')
-        #     else:
-        #         _LOGGER.warning('Failed to change alarm mode to disarmed')
-
-        # if args.home:
-        #     if lupusec.get_alarm().set_home():
-        #         _LOGGER.info('Alarm mode changed to home')
-        #     else:
-        #         _LOGGER.warning('Failed to change alarm mode to home')
-        #
-        # if args.history:
-        #     _LOGGER.info(json.dumps(lupusec.get_history(), indent=4, sort_keys=True))
-        #
-        # if args.status:
-        #     _LOGGER.info('Mode of panel: %s', lupusec.get_alarm().mode)
-
-        if args.devices:
-            for device in lupusec.get_switches():
-                _devicePrint(device.name)
-            for device in lupusec.get_sensors():
-                _devicePrint(device.name)
+        lupusec = LupusecStateMachine(args.ip_address,args.username, args.password, 5)
+        while True:
+            _LOGGER.info(lupusec.devices)
+            _LOGGER.info(lupusec.panels)
 
     except Exception as exc:
         _LOGGER.error(exc)
     finally:
         _LOGGER.info('--Finished running--')
+
+
+if __name__ == '__main__':
+    call()
